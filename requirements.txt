@@ -1,4 +1,4 @@
-uvicorn
 fastapi
+uvicorn
 openai
 python-dotenv
