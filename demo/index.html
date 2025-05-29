@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Chatbot GPT</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f2f5;
+            max-width: 700px;
+            margin: 40px auto;
+            padding: 20px;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        #chat {
+            background-color: #fff;
+            border-radius: 10px;
+            padding: 15px;
+            height: 450px;
+            overflow-y: auto;
+            border: 1px solid #ccc;
+        }
+
+        .message {
+            display: flex;
+            align-items: flex-end;
+            margin-bottom: 15px;
+        }
+
+        .message.bot {
+            flex-direction: row;
+        }
+
+        .message.user {
+            flex-direction: row-reverse;
+        }
+
+        .bubble {
+            padding: 10px 15px;
+            border-radius: 20px;
+            max-width: 70%;
+            position: relative;
+        }
+
+        .user .bubble {
+            background-color: #dcf8c6;
+            text-align: right;
+        }
+
+        .bot .bubble {
+            background-color: #ececec;
+            text-align: left;
+        }
+
+        .time {
+            font-size: 0.75em;
+            color: #666;
+            margin: 2px 8px;
+        }
+
+        .avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            margin: 0 10px;
+        }
+
+        #controls {
+            margin-top: 10px;
+            display: flex;
+            gap: 10px;
+        }
+
+        #messageInput {
+            flex: 1;
+            padding: 10px;
+            border-radius: 20px;
+            border: 1px solid #ccc;
+        }
+
+        button {
+            padding: 10px 20px;
+            border-radius: 20px;
+            border: none;
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        #clearBtn {
+            background-color: #dc3545;
+        }
+
+        #clearBtn:hover {
+            background-color: #a71d2a;
+        }
+    </style>
+</head>
+<body>
+    <h2>🤖 Chat con GPT</h2>
+    <div id="chat"></div>
+
+    <div id="controls">
+        <input type="text" id="messageInput" placeholder="Escribe tu mensaje..." onkeydown="if(event.key==='Enter') sendMessage()">
+        <button onclick="sendMessage()">Enviar</button>
+        <button id="clearBtn" onclick="clearChat()">Limpiar</button>
+    </div>
+
+    <script>
+        async function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const message = input.value.trim();
+            if (!message) return;
+
+            appendMessage(message, 'user');
+            input.value = '';
+
+            try {
+                const response = await fetch('http://127.0.0.1:8000/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: message })
+                });
+
+                const data = await response.json();
+                appendMessage(data.response, 'bot');
+            } catch (err) {
+                appendMessage("❌ Error al conectar con el bot", 'bot');
+            }
+        }
+
+        function appendMessage(text, sender) {
+            const chat = document.getElementById('chat');
+            const msg = document.createElement('div');
+            msg.className = `message ${sender}`;
+
+            const avatar = document.createElement('img');
+            avatar.className = 'avatar';
+            avatar.src = sender === 'user'
+                ? 'https://cdn-icons-png.flaticon.com/512/1946/1946429.png'
+                : 'https://cdn-icons-png.flaticon.com/512/4712/4712109.png';
+
+            const bubble = document.createElement('div');
+            bubble.className = 'bubble';
+            bubble.textContent = text;
+
+            const time = document.createElement('div');
+            time.className = 'time';
+            time.textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+            msg.appendChild(avatar);
+            msg.appendChild(bubble);
+            msg.appendChild(time);
+
+            chat.appendChild(msg);
+            chat.scrollTop = chat.scrollHeight;
+        }
+
+        function clearChat() {
+            document.getElementById('chat').innerHTML = '';
+        }
+    </script>
+</body>
+</html>
+
