@@ -1,3 +1,25 @@
+# Entornos virtuales
+venv/
 .env
+
+# Python
 __pycache__/
-*.pyc
+*.py[cod]
+*.pyo
+*.pyd
+*.egg-info/
+*.log
+
+# VS Code
+.vscode/
+
+# Sistema
+.DS_Store
+Thumbs.db
+
+# Carpetas de compilación
+build/
+dist/
+
+# Archivos temporales de sistema
+*.swp
